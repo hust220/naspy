@@ -1,1 +1,1 @@
-name = "nspy"
+name = "naspy"
