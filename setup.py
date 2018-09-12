@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="naspy",
-    version="0.0.1",
+    version="0.0.2",
     author="Jian Wang",
     author_email="jianopt@gmail.com",
     description="Nucleic acids Structure Prediction",
