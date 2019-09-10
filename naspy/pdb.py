@@ -9,56 +9,85 @@ class Atom(list):
         self.num = num
         self.extend([x, y, z])
 
+    def distance(self, atom2):
+        dx = self[0] - atom2[0]
+        dy = self[1] - atom2[1]
+        dz = self[2] - atom2[2]
+        return math.sqrt(dx * dx + dy * dy + dz * dz)
+
 class Residue(list):
     def __init__(self, name, num, atoms):
         self.name = name
         self.num = num
         self.extend(atoms)
 
-    def atom(self, name):
-        for atom in self:
-            if atom.name == name:
-                return atom
-        print "Couldn't find atom '%s'" % name
-        write_residue(r)
-        quit()
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return super(Residue, self).__getitem__(key)
+        else:
+            for atom in self:
+                if atom.name == key:
+                    return atom
+            print("Couldn't find atom '%s'" % key)
+            write_residue(self)
+            quit()
+
+    def atoms(self):
+        return [atom for atom in self]
 
 class Chain(list):
     def __init__(self, name, residues):
         self.name = name
         self.extend(residues)
 
-    def residue(self, n):
-        for r in self:
-            if r.num == n:
-                return r
-        print "Couldn't find residue %d in chain %s" % (n, self.name)
-        quit()
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return super(Chain, self).__getitem__(key)
+        else:
+            for residue in self:
+                if residue.num == key:
+                    return residue
+            print("Couldn't find residue %s in chain %s" % (key, self.name))
+            quit()
+
+    def residues(self):
+        return [residue for residue in self]
+
+    def atoms(self):
+        return [atom for residue in self for atom in residue]
 
 class Model(list):
     def __init__(self, num, chains):
         self.num = num
         self.extend(chains)
 
-    def residue(self, n):
-        for c in self:
-            for r in c:
-                if r.num == n:
-                    return r
-        print "Couldn't find residue %d" % n
-        quit()
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return super(Model, self).__getitem__(key)
+        else:
+            for chain in self:
+                if chain.name == key:
+                    return chain
+            print("Couldn't find chain %" % key)
+            quit()
+
+    def chains(self):
+        return [chain for chain in self]
+
+    def residues(self):
+        return [residue for chain in self for residue in chain]
+
+    def atoms(self):
+        return [atom for chain in self for residue in chain for atom in residue]
 
 class Structure(list):
     def __init__(self, name, models):
         self.name = name
         self.extend(models)
 
-    def model(self, n):
-        for m in self:
-            if m.num == n:
-                return m
-        print "Couldn't find Model %d" % n
-        quit()
+    @classmethod
+    def fromfile(cls, filename):
+        return PdbParser(filename).structure
 
 class ParsedLine:
     def __init__(self, line):
@@ -145,7 +174,7 @@ def write_model(model, f = sys.stdout):
 def write_residue(residue):
     num_atom = 1
     for atom in residue:
-        print "ATOM%7i  %-4s%3s%2s%4i%12.3lf%8.3lf%8.3lf%6.2f%6.2f%12c  \n" % \
-            (num_atom, atom.name , residue.name , chain.name , residue.num, atom[0], atom[1], atom[2] , 1.00 , 0.00, atom.name[0]),
+        print("ATOM%7i  %-4s%3s%2s%4i%12.3lf%8.3lf%8.3lf%6.2f%6.2f%12c  \n" % \
+            (num_atom, atom.name, residue.name, 'A', residue.num, atom[0], atom[1], atom[2] , 1.00 , 0.00, atom.name[0]), end="")
     num_atom += 1
  

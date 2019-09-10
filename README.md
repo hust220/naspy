@@ -1,3 +1,3 @@
 # NASPY
 
-[NSPY](https://github.com/hust220/naspy)
+[NASPY](https://github.com/hust220/naspy)
